@@ -29,6 +29,7 @@
 
 #import <Foundation/Foundation.h>
 
+
 @class IZGrowlNotification;
 
 @protocol IZGrowlNotificationDelegate
@@ -42,9 +43,11 @@
 	UIImage										*image;
 	id											context;
 	id<NSObject, IZGrowlNotificationDelegate>	delegate;
+  BOOL persist;
 }
 
 @property(nonatomic, retain) NSString *title;
+@property(nonatomic, assign) BOOL persist; // only show this context once
 @property(nonatomic, retain) NSString *description;
 @property(nonatomic, retain) UIImage *image; // The image to be displayed in the growl notification bubble. It will be displayed in 30x30 size.
 @property(nonatomic, retain) id context; // Pass anything here

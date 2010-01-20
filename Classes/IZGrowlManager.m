@@ -35,6 +35,7 @@
 @implementation IZGrowlNotification
 
 @synthesize title, description, image, context, delegate;
+@synthesize persist;
 
 - (id)initWithTitle:(NSString *)theTitle 
 		description:(NSString *)theDescription 
@@ -130,6 +131,7 @@
 #define kDefaultFadeOutTime 0.1
 #define kDefaultDisplayTime 3
 #define kMaxDisplayedNotifications 3
+#define kIZGrowlPersistedContexts @"IZGrowlPersistedContexts"
 
 @implementation IZGrowlManager
 
@@ -319,6 +321,19 @@ static IZGrowlManager *sharedManager = nil;
 
 - (void)doPostNotification:(IZGrowlNotification *)notification
 {
+  if (notification.persist && notification.context != nil &&
+      [notification.context conformsToProtocol:@protocol(NSCoding)]) {
+    NSArray *contexts = [[NSUserDefaults standardUserDefaults] objectForKey:
+                         kIZGrowlPersistedContexts];
+    if (!contexts)
+      contexts = [NSArray array];
+    if ([contexts containsObject:notification.context]) // already displayed
+      return;
+    [[NSUserDefaults standardUserDefaults] // persist context as displayed
+     setObject:[contexts arrayByAddingObject:notification.context]
+     forKey:kIZGrowlPersistedContexts];
+  }
+  
 	self.displayedNotifications++;
 	
 	IZGrowlNotificationButton *button = [self dequeueReusableButton];
